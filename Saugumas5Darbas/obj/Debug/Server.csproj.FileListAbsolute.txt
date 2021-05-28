@@ -1,0 +1,13 @@
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\bin\Debug\Saugumas5Darbas.exe.config
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\bin\Debug\Saugumas5Darbas.exe
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\bin\Debug\Saugumas5Darbas.pdb
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\bin\Debug\SimpleTCP.dll
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\obj\Debug\Saugumas5Darbas.Form1.resources
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\obj\Debug\Saugumas5Darbas.Properties.Resources.resources
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\obj\Debug\Server.csproj.GenerateResource.cache
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\obj\Debug\Server.csproj.CopyComplete
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\obj\Debug\Saugumas5Darbas.exe
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\obj\Debug\Saugumas5Darbas.pdb
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\obj\Debug\Server.csprojAssemblyReference.cache
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\bin\Debug\DocumentFormat.OpenXml.dll
+C:\Users\PC\source\repos\Saugumas5Darbas\Saugumas5Darbas\bin\Debug\DocumentFormat.OpenXml.xml
