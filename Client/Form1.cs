@@ -47,25 +47,26 @@ namespace Client
 
         private void btnSend_Click(object sender, EventArgs e)
         {
-            //write line and get reply,
-            var document = Encoding.UTF8.GetBytes("Document to Sign");
-            byte[] hashedDocument;
 
-            using (var sha256 = SHA256.Create())
-            {
-                hashedDocument = sha256.ComputeHash(document);
-            }
+            // Sender
+            //DigitalSignature.ContainerName = "KeyContainer";
+            //string secureMessage = $"Transfer $500 into account number 029192819283 on {DateTime.Now}";
+            string secureMessage = $"Transfer $500 into account number 029192819283 on {DateTime.Now}";
+            byte[] digitalSignature = DigitalSignature.SignMessage(secureMessage);
 
-            var digitalSignature = new DigitalSignature();
-            digitalSignature.AssignNewKey();
+            //var digitarSignatureString = Encoding.UTF8.GetString(digitalSignature);//convert to string
+            //Console.WriteLine("Client Digital signature send to server is:\n" + secureMessage);
+            //Console.WriteLine("Client Digital signature send to server is:\n" + digitarSignatureString);
 
-            var signature = digitalSignature.SignData(hashedDocument);
-            string signatureString = UTF8Encoding.UTF8.GetString(signature);
-            string hashedDocumentString = UTF8Encoding.UTF8.GetString(hashedDocument);
-            string message = signatureString + ";" + hashedDocumentString;
+            
 
+            string message = Encoding.UTF8.GetString(digitalSignature) + ";" + secureMessage;
 
-            client.WriteLineAndGetReply(message, TimeSpan.FromSeconds(3));
+            Console.WriteLine("\n Client signature:\n" + Encoding.UTF8.GetString(digitalSignature));
+            Console.WriteLine("\n Client secureMessage:\n" + secureMessage);
+            Console.WriteLine("\n Client full message:\n" + message);
+
+            client.WriteLine(message);
         }
     }
 }

@@ -14,6 +14,7 @@ namespace Saugumas5Darbas
 {
     public partial class Form1 : Form
     {
+        
         SimpleTcpServer server;
         public Form1()
         {
@@ -35,37 +36,47 @@ namespace Saugumas5Darbas
         {
             txtStatus.Invoke((MethodInvoker)delegate ()
             {
-                //set txtStatus(field in form) equal to message that was sent from client
-                string fullMessage = e.MessageString;
 
-                //spliting, becouse we send signature + ";" + hashedDocument
-                string[] data = fullMessage.Split(';');
+                //string fullMessage = e.MessageString;//gauname
+                //Console.WriteLine("Server received message: " + fullMessage);
+                char[] MyChar = { '' };
+                string fullMessage = e.MessageString;//gauname
+                fullMessage = fullMessage.TrimEnd(MyChar);
+
+                string[] data = fullMessage.Split(';');//split to get signature ; secureMessage
                 string signatureString = data[0];
-                string hashedDocumentString = data[1];
-
-                Console.WriteLine("signature : " + signatureString);
-                Console.WriteLine("hashedDocumentString : " + hashedDocumentString);
+                string secureMessage = data[1];
 
 
-                byte[] signature = UTF8Encoding.UTF8.GetBytes(signatureString);
-                byte[] hashedDocument = UTF8Encoding.UTF8.GetBytes(hashedDocumentString);
 
-                //creating DigitalSignature object and calling verify Signature method
-                var digitalSignature = new DigitalSignature();
-                var verified = digitalSignature.VerifySignature(hashedDocument, signature);
+                Console.WriteLine("\n Server full message received:\n" + fullMessage);
+                Console.WriteLine("\n Server signature received:\n" + signatureString);
+                Console.WriteLine("\n Server secureMessage received:\n" + secureMessage);
 
-                string result = "";
+                // Recipient
+                //get bytes of secureMessage
+                byte[] messageHash = secureMessage.ComputeMessageHash();
+                Console.WriteLine("\n Server hash: " + Encoding.UTF8.GetString(messageHash));
 
-                if (verified)
+
+                //convert string to bytes
+                byte[] digitalSignature = Encoding.UTF8.GetBytes(signatureString);
+                
+
+                if (DigitalSignature.VerifySignedMessage(messageHash, digitalSignature) == true)
                 {
-                    result = "The digital signature has been correctly verified.";
+                    Console.WriteLine($"Message '{secureMessage}' is valid and can be trusted.");
+                    txtStatus.Text = secureMessage;
                 }
-
-
-                //txtStatus.Text += ;
-
+                else
+                {
+                    Console.WriteLine($"The following message: '{secureMessage}' is not valid. DO NOT TRUST THIS MESSAGE!");
+                    txtStatus.Text = secureMessage;
+                }
+                
                 //e.ReplyLine(string.Format("You said: {0}", e.MessageString));
-                e.ReplyLine(string.Format("You said: {0}", result));
+                //e.ReplyLine(string.Format("You said: {0}", fullMessage));
+
             });
         }
 
@@ -91,37 +102,34 @@ namespace Saugumas5Darbas
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var document = Encoding.UTF8.GetBytes("Document to Sign");
-            byte[] hashedDocument;
+            
 
-            using (var sha256 = SHA256.Create())
+            DigitalSignature.ContainerName = "KeyContainer";
+
+            // Sender
+
+            string secureMessage = $"Transfer $500 into account number 029192819283 on {DateTime.Now}";
+
+            byte[] digitalSignature = DigitalSignature.SignMessage(secureMessage);
+
+            // Message intercepted
+
+            //secureMessage = $"Transfer $5000 into account number 849351278435 on {DateTime.Now}";
+
+            // Recipient
+            //get bytes of secureMessage
+            byte[] messageHash = secureMessage.ComputeMessageHash();
+
+            if (DigitalSignature.VerifySignedMessage(messageHash, digitalSignature))
             {
-                hashedDocument = sha256.ComputeHash(document);
-            }
-
-            var digitalSignature = new DigitalSignature();
-            digitalSignature.AssignNewKey();
-
-            var signature = digitalSignature.SignData(hashedDocument);
-            var verified = digitalSignature.VerifySignature(hashedDocument, signature);
-
-            Console.WriteLine("Digital Signature Demonstration in .NET");
-            Console.WriteLine("---------------------------------------");
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine("   Original Text = " + System.Text.Encoding.Default.GetString(document));
-            Console.WriteLine();
-            Console.WriteLine("   Digital Signature = " + Convert.ToBase64String(signature));
-            Console.WriteLine();
-
-            if (verified)
-            {
-                Console.WriteLine("The digital signature has been correctly verified.");
+                Console.WriteLine($"Message '{secureMessage}' is valid and can be trusted.");
             }
             else
             {
-                Console.WriteLine("The digital signature has NOT been correctly verified.");
+                Console.WriteLine($"The following message: '{secureMessage}' is not valid. DO NOT TRUST THIS MESSAGE!");
             }
+                
+
 
         }
     }

@@ -1,50 +1,61 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Saugumas5Darbas
 {
-    public sealed class DigitalSignature
+    public static class DigitalSignature
     {
-        private RSAParameters publicKey;
-        private RSAParameters privateKey;
+        //public static string ContainerName { get; private set; }
+        public static string ContainerName = "KeyContainer";
 
-        public void AssignNewKey()
+        public static byte[] SignMessage(string message)
         {
-            using (var rsa = new RSACryptoServiceProvider(2048))
+
+            using (SHA256 sha = SHA256Managed.Create())
+
             {
-                rsa.PersistKeyInCsp = false;
-                publicKey = rsa.ExportParameters(false);
-                privateKey = rsa.ExportParameters(true);
+
+                byte[] hashValue = sha.ComputeHash(Encoding.UTF8.GetBytes(message));
+
+                CspParameters csp = new CspParameters();
+
+                csp.KeyContainerName = ContainerName;
+
+                RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(csp);
+
+                var formatter = new RSAPKCS1SignatureFormatter(rsa);
+
+                formatter.SetHashAlgorithm("SHA256");
+
+                return formatter.CreateSignature(hashValue);
+
             }
+
         }
 
-        public byte[] SignData(byte[] hashOfDataToSign)
+        public static bool VerifySignedMessage(byte[] hash, byte[] signature)
         {
-            using (var rsa = new RSACryptoServiceProvider(2048))
+
+            CspParameters csp = new CspParameters();
+
+            csp.KeyContainerName = ContainerName;
+
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(csp))
+
             {
-                rsa.PersistKeyInCsp = false;
-                rsa.ImportParameters(privateKey);
 
-                var rsaFormatter = new RSAPKCS1SignatureFormatter(rsa);
-                rsaFormatter.SetHashAlgorithm("SHA256");
+                var deformatter = new RSAPKCS1SignatureDeformatter(rsa);
 
-                return rsaFormatter.CreateSignature(hashOfDataToSign);
+                deformatter.SetHashAlgorithm("SHA256");
+
+                return deformatter.VerifySignature(hash, signature);
+
             }
-        }
 
-        public bool VerifySignature(byte[] hashOfDataToSign, byte[] signature)
-        {
-            using (var rsa = new RSACryptoServiceProvider(2048))
-            {
-                rsa.ImportParameters(publicKey);
-
-                var rsaDeformatter = new RSAPKCS1SignatureDeformatter(rsa);
-                rsaDeformatter.SetHashAlgorithm("SHA256");
-
-                return rsaDeformatter.VerifySignature(hashOfDataToSign, signature);
-            }
         }
     }
 }
